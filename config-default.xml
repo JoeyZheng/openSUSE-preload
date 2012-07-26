@@ -50,7 +50,7 @@
 
 		<!-- Packages needed outside the default install -->
 		<package name="yast2-firstboot"/>
-		<package name="libstdc++33"/>
+		<package name="libstdc++46"/>
 		<package name="patch"/>
 
 		<!-- Packages needed for recompiling kernel -->
@@ -67,8 +67,6 @@
 
 		<!-- Packages needed for language support -->
 		<package name="translation-update"/>
-		<package name="translation-update-zh_CN"/>
-		<package name="translation-update-zh_TW"/>
 		<package name="yast2-trans-en_GB"/>
 		<package name="yast2-trans-en_US"/>
 		<package name="yast2-trans-zh_CN"/>
