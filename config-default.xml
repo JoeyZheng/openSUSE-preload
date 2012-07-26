@@ -41,12 +41,12 @@
 		<package name="kernel-desktop"/>
 		<package name="bootsplash-branding-openSUSE-12.1" bootinclude="true" bootdelete="true"/>
 		<package name="gfxboot-branding-openSUSE-12.1" bootinclude="true" bootdelete="true"/>
-		<opensusePattern name="default"/>
+		<opensusePattern name="base"/>
+		<opensusePattern name="enhanced_base"/>
 		<opensusePattern name="x11"/>
-		<opensusePattern name="desktop-base"/>
 		<opensusePattern name="laptop"/>
-		<opensusePattern name="desktop-gnome"/>
-		<opensusePattern name="desktop-gnome-laptop"/>
+		<opensusePattern name="gnome"/>
+		<opensusePattern name="gnome_basis"/>
 
 		<!-- Packages needed outside the default install -->
 		<package name="yast2-firstboot"/>
