@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Executing $0"
+
+# load modules again via udev
+/sbin/udevadm trigger
+/sbin/udevadm settle
+
+exit 0
+

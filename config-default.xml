@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image schemaversion="3.7" name="openSUSE-12.1-preload">
+	<description type="system">
+		<author>Joey Zheng</author>
+		<contact>joey@jzheng.org</contact>
+		<specification>openSUSE 12.1 preload system</specification>
+	</description>
+	<preferences>
+		<type primary="true" filesystem="ext4" boot="oemboot/suse-12.1" bootkernel="pae" vga="0x314" format="iso">oem</type>
+		<version>1.0.4</version>
+		<packagemanager>zypper</packagemanager>
+		<oem-systemsize>20480</oem-systemsize>
+		<oem-swapsize>2048</oem-swapsize>
+		<oem-home>true</oem-home>
+		<oem-recovery>true</oem-recovery>
+		<oem-recoveryID>27</oem-recoveryID>
+		<oem-inplace-recovery>true</oem-inplace-recovery>
+		<oem-reboot>true</oem-reboot>
+		<oem-dumphalt>true</oem-dumphalt>
+		<oem-boot-title>openSUSE 12.1</oem-boot-title>
+		<locale>en_US,en_GB,zh_CN,zh_TW</locale>
+	</preferences>
+	<repository type="yast2" priority="99">
+		<source path="iso://../ISO/openSUSE-12.1-DVD-i586.iso"/>
+	</repository>
+
+	<!-- Add maintenance updates as local repositories -->
+	<repository type="rpm-dir" priority="20">
+		<source path="this://maintenance-updates-20120723/i586/"/>
+	</repository>
+	<repository type="rpm-dir" priority="20">
+		<source path="this://maintenance-updates-20120723/noarch/"/>
+	</repository>
+
+	<!-- Add packages from a local repo -->
+	<repository type="rpm-dir" priority="10">
+		<source path="this://repo"/>
+	</repository>
+
+	<packages type="image" patternType="plusRecommended">
+		<package name="kernel-desktop"/>
+		<package name="bootsplash-branding-openSUSE-12.1" bootinclude="true" bootdelete="true"/>
+		<package name="gfxboot-branding-openSUSE-12.1" bootinclude="true" bootdelete="true"/>
+		<opensusePattern name="default"/>
+		<opensusePattern name="x11"/>
+		<opensusePattern name="desktop-base"/>
+		<opensusePattern name="laptop"/>
+		<opensusePattern name="desktop-gnome"/>
+		<opensusePattern name="desktop-gnome-laptop"/>
+
+		<!-- Packages needed outside the default install -->
+		<package name="yast2-firstboot"/>
+		<package name="libstdc++33"/>
+		<package name="patch"/>
+
+		<!-- Packages needed for recompiling kernel -->
+<!-- probably need, so leave this sectoin here.
+		<package name="kernel-source"/>
+		<package name="kernel-desktop-devel"/>
+		<package name="binutils"/>
+		<package name="gcc"/>
+		<package name="gcc-c++"/>
+		<package name="make"/>
+-->
+
+		<!-- Packages that are in a default install but not here -->
+
+		<!-- Packages needed for language support -->
+		<package name="translation-update"/>
+		<package name="translation-update-zh_CN"/>
+		<package name="translation-update-zh_TW"/>
+		<package name="yast2-trans-en_GB"/>
+		<package name="yast2-trans-en_US"/>
+		<package name="yast2-trans-zh_CN"/>
+		<package name="yast2-trans-zh_TW"/>
+		<!-- end of language support packages -->
+
+	</packages>
+
+	<packages type="bootstrap">
+		<package name="filesystem"/>
+		<package name="glibc-locale"/>
+		<!-- libzypp does not require util-linux (bnc#613304) -->
+		<package name="util-linux"/>
+	</packages>
+
+	<packages type="delete">
+		<!-- Remove compiz -->
+<!--
+		<package name="compiz"/>
+		<package name="compiz-branding-openSUSE"/>
+		<package name="compiz-fusion-plugins-extra"/>
+		<package name="compiz-fusion-plugins-main"/>
+		<package name="compiz-gnome"/>
+		<package name="compiz-manager"/>
+		<package name="compiz-plugins-dmx"/>
+		<package name="compizconfig-settings-manager"/>
+		<package name="libcompizconfig"/>
+		<package name="python-compizconfig"/>
+		<package name="simple-ccsm"/>
+-->
+	</packages>
+</image>

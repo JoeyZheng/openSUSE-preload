@@ -1,0 +1,29 @@
+#! /bin/sh
+
+dir=/usr/share/zeroboot
+
+#
+# Start zeroboot scripts in given link order
+#
+for i in ${dir}/* ; do
+
+    test -f $i || continue
+
+    echo "${i##*/}..."
+    if test -x "$i" ; then
+	$i
+    elif test -r "$i" ; then
+        /bin/sh $i
+    fi
+done
+
+#
+# Replace boot.local by boot.local.orig and call it
+#
+if test -f $0.orig ; then
+    sync
+    mv -f $0.orig $0 && chmod 744 $0 && exec $0 "$@"
+fi
+
+exit 0
+

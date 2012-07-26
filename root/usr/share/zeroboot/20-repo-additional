@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "Executing $0"
+
+echo "Starting Additional repo setup"
+
+# automatic KMP installation via zypper inr
+zypper ar /tmp/SWSetup SWSetup
+zypper ref SWSetup
+zypper -n inr
+
+# TODO : add packman repo
+
+/sbin/depmod -a
+
+# clean up temporary repo
+zypper rr SWSetup
+
+exit 0
+

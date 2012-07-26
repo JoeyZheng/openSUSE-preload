@@ -1,0 +1,26 @@
+#!/bin/bash
+echo "Executing $0"
+
+gfx="`/sbin/lspci -n | grep -e '^..:..\.. 0300: ' | cut -d\  -f3`"
+
+case "x$gfx" in
+
+x10de:*)
+	# NVidia
+	;;
+
+x8086:*)
+	# Intel
+	;;
+
+x1002:*)
+	echo "ATI card detected - installing driver"
+
+	;;
+
+*)
+	echo "Unknown graphics adapter"
+	;;
+esac
+
+exit 0

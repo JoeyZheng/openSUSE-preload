@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# Clean up the chroot environment for the image build
+#
+
+PROGNAME=cleanup_oldbuild
+OLDROOT=/oldbuild
+
+remove_all=
+if [ x"$1" = x"-r" ]; then
+   remove_all=yes
+   shift
+fi
+
+KIWIVER="$1"
+if [ -z "$KIWIVER" ]; then
+   echo "usage: $PROGNAME [-r] KIWI-version"
+   echo "    -r: Remove the whole chroot directory"
+   exit 1
+fi
+
+case "$KIWIVER" in
+    /oldbuild/*)
+	KIWIVER=${KIWIVER#/oldbuild/}
+	;;
+esac
+case "$KIWIVER" in
+    */)
+	KIWIVER=${KIWIVER%/}
+	;;
+esac
+
+JAIL=$OLDROOT/$KIWIVER
+if [ ! -d $JAIL ]; then
+   echo "$JAIL doesn't exist"
+   exit 1
+fi
+
+umount $JAIL/data/kiwi-root/shm >/dev/null 2>&1
+umount $JAIL/data >/dev/null 2>&1
+umount $JAIL/data_build >/dev/null 2>&1
+umount $JAIL/dev/shm >/dev/null 2>&1
+umount $JAIL/dev/pts >/dev/null 2>&1
+umount $JAIL/dev >/dev/null 2>&1
+umount $JAIL/proc >/dev/null 2>&1
+umount $JAIL/sys >/dev/null 2>&1
+
+if [ -n "$remove_all" ]; then
+    if [ -d $JAIL/data_build ]; then
+	if ! rmdir $JAIL/data_build; then
+	    echo "Something wrong in $JAIL/data_build!"
+	    exit 1
+	fi
+    fi
+    if [ -d $JAIL/data ]; then
+	if ! rmdir $JAIL/data; then
+	    echo "Something wrong in $JAIL/data!"
+	    exit 1
+	fi
+    fi
+    if grep -q $JAIL /proc/mounts; then
+	echo "The directory is still mounted!"
+	grep $JAIL /proc/mounts
+	exit 1
+    fi
+    echo "Cleaning up $JAIL..."
+    rm -rf $JAIL
+fi
+
+exit 0

@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+# Run build script in chroot environment
+#
+# Prepare chroot environment via make_oldbuild script beforehand.
+# Pass the KIWI version (e.g. 3.74-5.57.3) or the directory path
+# (e.g. /oldbuild/3.74-5.57.3) as the first argument.
+# The rest arguments are the command to run, typically such as,
+#
+#    oldbuild /oldbiuld/3.74-5.57.3 ./berg-ruft.sh
+#
+
+PROGNAME=oldbuild
+OLDROOT=/oldbuild
+
+KIWIVER="$1"
+shift
+if [ -z "$KIWIVER" ]; then
+   echo "usage: $PROGNAME KIWI-ver commands..."
+   exit 1
+fi
+
+case "$KIWIVER" in
+    /oldbuild/*)
+	KIWIVER=${KIWIVER#/oldbuild/}
+	;;
+esac
+case "$KIWIVER" in
+    */)
+	KIWIVER=${KIWIVER%/}
+	;;
+esac
+
+JAIL=$OLDROOT/$KIWIVER
+if [ ! -d $JAIL ]; then
+   echo "$JAIL doesn't exist"
+   exit 1
+fi
+
+if [ ! -d $JAIL/bin ]; then
+   echo "Invalid root directory $JAIL"
+   exit 1
+fi
+
+mount --rbind /dev $JAIL/dev
+mount -t proc none $JAIL/proc
+mount -t sysfs none $JAIL/sys
+mount --bind /data $JAIL/data
+test -d /data_build && mount --bind /data_build $JAIL/data_build
+
+cleanup () {
+   echo "cleaned up..."
+   umount $JAIL/data/kiwi-root/shm >/dev/null 2>&1
+   umount $JAIL/data >/dev/null 2>&1
+   umount $JAIL/data_build >/dev/null 2>&1
+   umount $JAIL/dev/pts >/dev/null 2>&1
+   umount $JAIL/dev >/dev/null 2>&1
+   umount $JAIL/proc >/dev/null 2>&1
+   umount $JAIL/sys >/dev/null 2>&1
+}
+
+trap cleanup 0
+
+wrapper=""
+case $(uname -m) in
+    i?86)
+	;;
+    *)
+	wrapper="linux32"
+	;;
+esac
+
+oldcwd=$(pwd)
+if [ "$oldcwd" != / ]; then
+    cmds="$*"
+    test -z "$cmds" && cmds="/bin/bash"
+    chroot $JAIL /bin/sh -c "cd $oldcwd; exec $wrapper $cmds"
+else
+    chroot $JAIL $wrapper $@
+fi
+
+cleanup
+exit 0

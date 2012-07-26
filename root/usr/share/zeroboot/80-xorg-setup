@@ -1,0 +1,46 @@
+#!/bin/bash
+echo "Executing $0"
+
+gfx="`/sbin/lspci -n | grep -e '^..:..\.. 0300: ' | cut -d\  -f3`"
+
+case "x$gfx" in
+
+x10de:*)
+	echo "NVidia card detected"
+
+	echo "***********************************"
+	echo "No special treatment yet for NVidia"
+	echo "***********************************"
+
+
+	;;
+
+x8086:*)
+	echo "Intel card detected"
+
+	# Configure X
+
+	;;
+
+x1002:*)
+	echo "ATI card detected"
+
+	# Configure X
+	/usr/bin/aticonfig --initial --force
+	#/usr/bin/aticonfig --initial --input=/etc/X11/xorg.conf
+
+	# Fix virtual in xorg.conf
+	perl -i -ne '$_="" if /^\s*virtual\s/i; print; print "\t\tVirtual   3840 2048\n" if /^\s*subsection\s*"?display"?\s*$/i;' /etc/X11/xorg.conf
+
+	;;
+
+*)
+	echo "************************************************"
+	echo "Unknown graphics adapter - trying default config"
+	echo "************************************************"
+
+	/usr/sbin/sax2 -r -a
+	;;
+esac
+
+exit 0

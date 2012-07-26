@@ -1,0 +1,74 @@
+#!/bin/sh
+#
+# Prepare the chroot environment with the given KIWI packages
+#
+# The chroot directory is created under /oldbuild/$KIWI_VERSION.
+# This directory can be used for building with oldbuild script.
+#
+# Pass the KIWI packages to install in the chroot environment.
+#
+
+PROGNAME=make_oldbuild
+OLDROOT=/oldbuild
+
+if [ -z "$1" ]; then
+   echo "usage: $PROGNAME KIWI-RPMs"
+   exit 1
+fi
+
+kiwiver=""
+for i in $*; do
+    case $i in
+	kiwi-[0-9]*.rpm|*/kiwi-[0-9]*.rpm)
+	    kiwiver=$(rpm -qp $i)
+	    kiwiver=${kiwiver#kiwi-}
+	    ;;
+    esac
+done
+
+if [ -z "$kiwiver" ]; then
+    echo "No kiwi.rpm is given"
+    exit 1
+fi
+
+JAIL=$OLDROOT/$kiwiver
+if [ -d $JAIL ]; then
+    echo "$JAIL already exists; clean up it first"
+    exit 1
+fi
+
+mkdir -p $JAIL
+pushd $JAIL
+
+# hard-link copy most of directories
+for i in bin etc lib lib64 root sbin usr; do
+    cp -al /$i .
+done
+mkdir dev proc sys tmp var data data_build
+chmod a+rwt tmp
+
+# set up /var; this can't be hardlinks
+for i in adm cache lock opt X11R6 yp; do
+    cp -a /var/$i var
+done
+# /var/lib/ntp is mounted to /proc, so need to skip it
+mkdir -p var/lib
+for i in /var/lib/*; do
+    case $i in
+	*/ntp)
+	    ;;
+	*)
+	    cp -a $i var/lib
+	    ;;
+    esac
+done
+mkdir var/tmp var/mail var/spool var/run
+chmod a+rwt var/tmp
+
+popd
+
+# install new rpms (try again with --nodeps if failed)
+rpm -Uvh --root $JAIL --force $* || \
+  rpm -Uvh --root $JAIL --force --nodeps $*
+
+exit 0

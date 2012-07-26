@@ -1,0 +1,14 @@
+#!/bin/bash
+echo "Executing $0"
+
+adjust_mount_dev () {
+    dev=$(grep '^/dev/[^ ]\+ \+'"$1"' \+' /proc/mounts | awk '{print $1}')
+    if [ -n "$dev" ]; then
+	tune2fs -c -1 -i 0 $dev
+    fi
+}
+
+adjust_mount_dev /
+adjust_mount_dev /home
+
+exit 0
